@@ -1,0 +1,14 @@
+
+LISTA DE COISAS PRA FAZER
+PS: quando começarem a fazer alguma delas coloquem o nome do lado, pra não ter várias pessoas fazendo a mesma coisa.
+
+CÓDIGO
+(X) Estrutura principal (classes, métodos, etc)
+(X) Gerar e exibir os labirintos
+( ) Movimentação do agente pelo labirinto (método deliberar())
+
+PARA ENTREGAR NO MOODLE 21/03
+( ) Diagrama de classes
+( ) .txt ou .doc falando
+	- Quantidade de estados possíveis
+	- Classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
