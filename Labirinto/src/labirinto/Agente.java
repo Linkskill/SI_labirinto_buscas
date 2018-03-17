@@ -13,12 +13,13 @@ import java.util.ArrayList;
  * @author Saphira
  */
 public class Agente {
+    private Labirinto labirinto; //Associação com um labirinto
     private Posicao posicaoAtual;
     private List<Posicao> caminhoPercorrido;
-    private Labirinto labirinto;
     
-    public Agente(Labirinto labirinto){
-        posicaoAtual = null;
+    public Agente(Labirinto lab){
+        labirinto = lab;
+        posicaoAtual = lab.getStart();
         caminhoPercorrido = new ArrayList<>();
     }
     public void run(){
@@ -28,7 +29,7 @@ public class Agente {
         }
     }
     public void deliberar() {
-        //Decide para onde ir
+        //Decide o próximo lugar para onde ir
         
         //caminhoPercorrido.add(decisao);
         //posicaoAtual = decisao;
