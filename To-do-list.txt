@@ -8,7 +8,7 @@ CÓDIGO
 ( ) Movimentação do agente pelo labirinto (método deliberar())
 
 PARA ENTREGAR NO MOODLE 21/03
-( ) Diagrama de classes
+( ) Diagrama de classes	-> Lincoln
 ( ) .txt ou .doc falando
 	- Quantidade de estados possíveis
 	- Classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
