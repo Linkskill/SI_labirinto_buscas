@@ -7,7 +7,7 @@ PARA ENTREGAR NO MOODLE 21/03
 (X) .txt ou .doc falando
 	- Quantidade de estados possíveis
 	- Classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
-( ) Movimentação do agente pelo labirinto (método deliberar()). A cada chamada do método deliberar() o agente deve executar UMA E APENAS UMA ação de movimentação. 
+(X) Movimentação do agente pelo labirinto (método deliberar()). A cada chamada do método deliberar() o agente deve executar UMA E APENAS UMA ação de movimentação. - JooJ
 	
 (X) Estrutura inicial (classes, métodos, etc)
 (X) Criar e exibir os labirintos
