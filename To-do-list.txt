@@ -3,18 +3,10 @@ LISTA DE COISAS PRA FAZER
 PS: quando começarem a fazer alguma delas coloquem o nome do lado, pra não ter várias pessoas fazendo a mesma coisa.
 
 PARA ENTREGAR NO MOODLE 21/03
-( ) Diagrama de classes	-> Lincoln
-( ) .txt ou .doc falando
+(X) Diagrama de classes	-> Lincoln
+(X) .txt ou .doc falando
 	- Quantidade de estados possíveis
-		N*M (número de células no grid - número de paredes)
-		Citar um exemplo (grid de 10x10, com 5 paredes ou algo assim)
 	- Classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
-		Completamente observável
-		Um só agente
-		Determinístico
-		Squencial
-		Estático
-		Discreto
 ( ) Movimentação do agente pelo labirinto (método deliberar()). A cada chamada do método deliberar() o agente deve executar UMA E APENAS UMA ação de movimentação. 
 	
 (X) Estrutura inicial (classes, métodos, etc)
