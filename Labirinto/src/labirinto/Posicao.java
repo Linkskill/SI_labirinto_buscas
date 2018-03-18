@@ -13,9 +13,28 @@ public class Posicao {
     private int x;
     private int y;
     
-    public Posicao(int x, int y){
-        this.x = x;
+    public Posicao(int y, int x){
         this.y = y;
+        this.x = x;
+    }
+    @Override
+    public String toString(){
+        return "(" + y + ", " + x + ")";
+    }
+    @Override
+    public boolean equals(Object other){
+        Posicao p = (Posicao)other;
+        if (x == p.getX() && y == p.getY())
+            return true;
+        return false;
+    }
+    /* Netbeans gera sozinho, é necessário pra dar override no equals */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + this.x;
+        hash = 59 * hash + this.y;
+        return hash;
     }
     public int getX(){ return x; }
     public int getY(){ return y; }

@@ -43,8 +43,6 @@ public class T1_Labirinto {
             String filename = input.next();
             
             matrix = getMatrixFromFile(filename);
-            
-            lab = new Labirinto(matrix[0].length, matrix.length, matrix);
         }
         else if (option == '2'){
             System.out.println("Tamanho (X Y): ");
@@ -52,14 +50,13 @@ public class T1_Labirinto {
             int y = input.nextInt();
             
             matrix = Labirinto.genMatrix(x, y);
-            
-            lab = new Labirinto(matrix[0].length, matrix.length, matrix);
         }
         else{
             System.out.println("Opcao invalida. Saindo...");
             System.exit(3);
         }
-        lab.print(new Posicao(-1, -1));
+        lab = new Labirinto(matrix[0].length, matrix.length, matrix);
+        lab.show();
         
         Agente agente = new Agente(lab);
         agente.run();

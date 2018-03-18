@@ -19,9 +19,11 @@ public class Labirinto {
     private final int largura;
     private final int altura;
     private char[][] cells;
+    /* O 'A' (representação do agente) só aparece na matriz durante
+    as impressões. */
     private Posicao start;
     private Posicao exit;
-    private Agente agent;
+    private Agente agente;
     
     public Labirinto (int larg, int alt, char[][] matrix){
         largura = larg;
@@ -32,12 +34,13 @@ public class Labirinto {
             for(int j=0; j < largura; j++)
             {
                 if(cells[i][j] == 'S')
-                    start = new Posicao(j, i);
+                    start = new Posicao(i, j);
                 else if(cells[i][j] == 'E')
-                    exit = new Posicao(j, i);
+                    exit = new Posicao(i, j);
             }
-        agent = null;
+        agente = null;
     }
+    
     /** Adaptação do Algoritmo de Prim Randomizado
      * https://en.wikipedia.org/wiki/Maze_generation_algorithm
      */
@@ -58,7 +61,7 @@ public class Labirinto {
         List<Posicao> walls = new LinkedList<>();
         for(int i=max(y-1, 0); i <= min(y+1, alt-1); i++)
             for(int j=max(x-1, 0); j <= min(x+1, larg-1); j++)
-                walls.add(new Posicao(j, i));
+                walls.add(new Posicao(i, j));
 
         /* Pega uma célula qualquer do lado inferior direito e marca como saída. */
         int xExit = rand.nextInt(larg/2) + larg/2;
@@ -67,7 +70,7 @@ public class Labirinto {
         /* Coloca as paredes vizinhas dessa célula na lista. */
         for(int i=max(yExit-1, 0); i <= min(yExit+1, alt-1); i++)
             for(int j=max(xExit-1, 0); j <= min(xExit+1, larg-1); j++)
-                walls.add(new Posicao(j, i));
+                walls.add(new Posicao(i, j));
             
         /* Enquanto existem paredes na lista */
         while(!walls.isEmpty()){
@@ -81,9 +84,9 @@ public class Labirinto {
             for(int i=max(y-1, 0); i <= min(y+1, alt-1); i++)
                 for(int j=max(x-1, 0); j <= min(x+1, larg-1); j++)
                     if (auxGrid[i][j] != '1')
-                        caminhosVizinhos.add(new Posicao(j, i));
+                        caminhosVizinhos.add(new Posicao(i, j));
                     else
-                        paredesVizinhas.add(new Posicao(j, i));
+                        paredesVizinhas.add(new Posicao(i, j));
             
             if (caminhosVizinhos.size() <= 2){
                 /* Se tem poucas maneiras de chegar até essa
@@ -99,8 +102,24 @@ public class Labirinto {
         }
         return auxGrid;
     }
-
-    public void print(Posicao agente){
+    
+    public void show(){
+        if(agente != null){
+            /* Antes de imprimir coloca o agente na matriz. Depois
+            retorna ela à representação original. */
+            Posicao posAgente = agente.getPosicaoAtual();
+            char original = cells[posAgente.getY()][posAgente.getX()];
+            cells[posAgente.getY()][posAgente.getX()] = 'A';
+            print();
+            cells[posAgente.getY()][posAgente.getX()] = original;
+        } else {
+            /* Se o agente ainda não está funcionando, somente
+            imprime o labirinto */
+            print();
+        }
+    }
+    
+    private void print(){
         String linhaSeparadora = "+";
         for(int j=0; j < largura; j++)
             linhaSeparadora = linhaSeparadora.concat("---+");
@@ -115,26 +134,35 @@ public class Labirinto {
         /* Número das linhas e o labirinto em si */
         for(int i=0; i < altura; i++){
             System.out.print("|");
-            for(int j=0; j < largura; j++){
-                if(agente.getY() == i && agente.getX() == j){
-                    System.out.print(" A |");
-                } else {
-                    switch (cells[i][j]) {
-                        case '0':
-                            System.out.print("   |");
-                            break;
-                        case '1':
-                            System.out.print("XXX|");
-                            break;
-                        default:
-                            System.out.print(" " + cells[i][j] + " |");
-                            break;
-                    }
+            for(int j=0; j < largura; j++)
+                switch (cells[i][j]) {
+                    case '0':
+                        System.out.print("   |");
+                        break;
+                    case '1':
+                        System.out.print("XXX|");
+                        break;
+                    default:
+                        System.out.print(" " + cells[i][j] + " |");
+                        break;
                 }
-            }
             System.out.println(" " + i);
             System.out.println(linhaSeparadora);
         }
+    }
+
+    public boolean isAccessible(int row, int col) {
+         /* Se estiver saindo dos limites do labirinto ou for
+         uma parede, não pode ir para aquela posição. */
+        if(row < 0 || col < 0 || row >= altura || col >= largura
+            || cells[row][col] == '1')
+            return false;
+        else
+            return true;
+    }
+
+    public void setAgente(Agente a){
+        agente = a;
     }
     public Posicao getStart(){
         return start;
@@ -144,12 +172,5 @@ public class Labirinto {
     }
     public char[][] getCells(){
         return cells;
-    }
-    public char getPos(Posicao pos){
-        if(pos.getY() < 0 || pos.getX() < 0){
-            return 'x';
-        } else if(pos.getY() >= altura || pos.getX() >= largura){
-            return 'x';
-        } else return cells[pos.getY()][pos.getX()];
     }
 }
