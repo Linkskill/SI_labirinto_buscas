@@ -100,7 +100,7 @@ public class Labirinto {
         return auxGrid;
     }
 
-    public void print(){
+    public void print(Posicao agente){
         String linhaSeparadora = "+";
         for(int j=0; j < largura; j++)
             linhaSeparadora = linhaSeparadora.concat("---+");
@@ -116,16 +116,20 @@ public class Labirinto {
         for(int i=0; i < altura; i++){
             System.out.print("|");
             for(int j=0; j < largura; j++){
-                switch (cells[i][j]) {
-                    case '0':
-                        System.out.print("   |");
-                        break;
-                    case '1':
-                        System.out.print("XXX|");
-                        break;
-                    default:
-                        System.out.print(" " + cells[i][j] + " |");
-                        break;
+                if(agente.getY() == i && agente.getX() == j){
+                    System.out.print(" A |");
+                } else {
+                    switch (cells[i][j]) {
+                        case '0':
+                            System.out.print("   |");
+                            break;
+                        case '1':
+                            System.out.print("XXX|");
+                            break;
+                        default:
+                            System.out.print(" " + cells[i][j] + " |");
+                            break;
+                    }
                 }
             }
             System.out.println(" " + i);
@@ -137,5 +141,15 @@ public class Labirinto {
     }
     public Posicao getExit(){
         return exit;
+    }
+    public char[][] getCells(){
+        return cells;
+    }
+    public char getPos(Posicao pos){
+        if(pos.getY() < 0 || pos.getX() < 0){
+            return 'x';
+        } else if(pos.getY() >= altura || pos.getX() >= largura){
+            return 'x';
+        } else return cells[pos.getY()][pos.getX()];
     }
 }

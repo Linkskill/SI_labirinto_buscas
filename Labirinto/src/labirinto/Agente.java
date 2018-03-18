@@ -7,6 +7,7 @@ package labirinto;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -26,13 +27,30 @@ public class Agente {
         posicaoAtual = labirinto.getStart();
         while(posicaoAtual != labirinto.getExit()){
             deliberar();
+            labirinto.print(posicaoAtual);
+            deliberar();
+            labirinto.print(posicaoAtual);
+            deliberar();
+            labirinto.print(posicaoAtual);
+            deliberar();
+            labirinto.print(posicaoAtual);
+            deliberar();
+            labirinto.print(posicaoAtual);
+            System.exit(0);
         }
     }
     public void deliberar() {
         //Decide o próximo lugar para onde ir
+        Posicao decisao = new Posicao(this.posicaoAtual.getX(), this.posicaoAtual.getY() + 1);
         
-        //caminhoPercorrido.add(decisao);
-        //posicaoAtual = decisao;
+        if(labirinto.getPos(decisao) == 'x'){
+            System.out.println("Violação de mapa");
+        } else if(labirinto.getPos(decisao) == '1'){
+            System.out.println("Parede no caminho!");
+        } else {
+            caminhoPercorrido.add(decisao);
+            posicaoAtual = decisao;
+        }
     }
     public Posicao getPosicaoAtual(){
         return posicaoAtual;

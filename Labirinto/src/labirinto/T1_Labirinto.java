@@ -59,7 +59,7 @@ public class T1_Labirinto {
             System.out.println("Opcao invalida. Saindo...");
             System.exit(3);
         }
-        lab.print();
+        lab.print(new Posicao(-1, -1));
         
         Agente agente = new Agente(lab);
         agente.run();
