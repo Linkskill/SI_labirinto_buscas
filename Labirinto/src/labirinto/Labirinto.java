@@ -21,9 +21,10 @@ public class Labirinto {
     private char[][] cells;
     /* O 'A' (representação do agente) só aparece na matriz durante
     as impressões. */
-    private Posicao start;
-    private Posicao exit;
     private Agente agente;
+
+    private Estado start;
+    private Estado exit;
     
     public Labirinto (int larg, int alt, char[][] matrix){
         largura = larg;
@@ -33,10 +34,10 @@ public class Labirinto {
         for(int i=0; i < altura; i++)
             for(int j=0; j < largura; j++)
             {
-                if(cells[i][j] == 'S')
-                    start = new Posicao(i, j);
+                if(cells[i][j] == 'S') 
+                    start = new Estado(new Posicao(i, j), this);
                 else if(cells[i][j] == 'E')
-                    exit = new Posicao(i, j);
+                    exit = new Estado(new Posicao(i, j), this);
             }
         agente = null;
     }
@@ -107,11 +108,12 @@ public class Labirinto {
         if(agente != null){
             /* Antes de imprimir coloca o agente na matriz. Depois
             retorna ela à representação original. */
-            Posicao posAgente = agente.getPosicaoAtual();
-            char original = cells[posAgente.getY()][posAgente.getX()];
-            cells[posAgente.getY()][posAgente.getX()] = 'A';
+            int xAtual = agente.getXAtual();
+            int yAtual = agente.getYAtual();
+            char original = cells[yAtual][xAtual];
+            cells[yAtual][xAtual] = 'A';
             print();
-            cells[posAgente.getY()][posAgente.getX()] = original;
+            cells[yAtual][xAtual] = original;
         } else {
             /* Se o agente ainda não está funcionando, somente
             imprime o labirinto */
@@ -164,10 +166,10 @@ public class Labirinto {
     public void setAgente(Agente a){
         agente = a;
     }
-    public Posicao getStart(){
+    public Estado getStart(){
         return start;
     }
-    public Posicao getExit(){
+    public Estado getExit(){
         return exit;
     }
     public char[][] getCells(){

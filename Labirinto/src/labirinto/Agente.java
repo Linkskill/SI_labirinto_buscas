@@ -7,6 +7,7 @@ package labirinto;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  *
@@ -14,8 +15,11 @@ import java.util.ArrayList;
  */
 public class Agente {
     private Labirinto labirinto; //Associação com um labirinto
-    private Posicao posicaoAtual;
-    private List<Posicao> caminhoPercorrido;
+    private Estado estadoAtual;
+    private List<Estado> grafoEstados;
+    private List<Posicao> solucao;
+    /* OU lista de estados */
+    
     /* Um estado é representado por posição atual e matriz com
     os obstáculos e objetivos.
         Não é necessário alocar uma grid ou labirinto novo para
@@ -26,11 +30,59 @@ public class Agente {
         labirinto = lab; 
         labirinto.setAgente(this);
         
-        posicaoAtual = labirinto.getStart();
-        caminhoPercorrido = new ArrayList<>();
+        estadoAtual = labirinto.getStart();
+        solucao = new ArrayList<>();
     }
     public void run(){
-        posicaoAtual = labirinto.getStart();
+        grafoEstados = montaGrafo(estadoAtual);
+    }
+        
+    private List<Estado> montaGrafo(Estado start){
+        List<Estado> fila = new LinkedList<>(); //Fila de nós que ainda falta
+        //colocar no grafo
+        
+        /* Coloca os vizinhos do estado inicial na lista */
+        List<Posicao> posicoes = start.calculaPosicoesPossiveis();
+        for (Posicao p : posicoes)
+            start.getEstadosPossiveis().add(new Estado(p, labirinto));
+        grafoEstados.add(start);
+
+        for (Posicao p : posicoes)
+            fila.add(new Estado(p,labirinto));
+        
+        Estado atual;
+        while(!fila.isEmpty())
+        {
+            /* Tira um estado da fila (ie. um estado que não está no grafo)
+            cria a lista de adjascências desse estado e coloca ele no grafo.*/
+            atual = fila.remove(0);
+            posicoes = atual.calculaPosicoesPossiveis();
+
+            boolean isAlreadyOnGraph;
+            for (Posicao p : posicoes)
+            {
+                /* Se já existe um estado com essa mesma posição, referencia à
+                este objeto ao invés de criar um novo. */
+                isAlreadyOnGraph = false;
+                for (Estado e : grafoEstados)
+                {
+                    if(p.equals(e.getPosicao()))
+                    {
+                        isAlreadyOnGraph = true;
+                        atual.getEstadosPossiveis().add(e);
+                        break;
+                    }
+                }
+                /* Se não está no grafo,
+                if(!isAlreadyOnGraph)
+                    atual.getEstadosPossiveis().add(new Estado(p,labirinto));
+            }
+            grafoEstados.add(atual);
+        }
+    }
+    
+    
+    public void move(){
         /* Enquanto o nosso agente é burro, faz apenas alguns
         movimentos (se ele não resolveu nesse tempo, é provável
         que nem consiga resolver). 
@@ -54,6 +106,8 @@ public class Agente {
         }
         
     }
+
+    /* */
     public void deliberar() {
         //Decide o próximo lugar para onde ir
 
@@ -83,10 +137,13 @@ public class Agente {
         //Quanto tiver as buscas vai ser algo como
         //Posicao decisao = busca();
         
-        caminhoPercorrido.add(decisao);
+        solucao.add(decisao);
         posicaoAtual = decisao;
     }
-    public Posicao getPosicaoAtual(){
-        return posicaoAtual;
+    public int getXAtual(){
+        return xAtual;
+    }
+    public int getYAtual(){
+        return yAtual;
     }
 }
