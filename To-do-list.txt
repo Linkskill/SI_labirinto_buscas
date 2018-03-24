@@ -2,16 +2,20 @@
 LISTA DE COISAS PRA FAZER
 PS: quando começarem a fazer alguma delas coloquem o nome do lado, pra não ter várias pessoas fazendo a mesma coisa.
 
-PARA ENTREGAR NO MOODLE 21/03
+T1 - Entrega 21/03
+(X) Labirinto: grid com paredes, caminhos, início e saída
+(X) Sistema inteligente com agente burro
+	(X) Movimentação do agente pelo labirinto (método deliberar()). A cada chamada do método deliberar() o agente deve executar UMA E APENAS UMA ação de movimentação
+(X) Possibilidade de informar a matriz do labirinto através de um arquivo
 (X) Diagrama de classes	-> Lincoln
 (X) .txt ou .doc falando
 	- Quantidade de estados possíveis
 	- Classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
-(X) Movimentação do agente pelo labirinto (método deliberar()). A cada chamada do método deliberar() o agente deve executar UMA E APENAS UMA ação de movimentação. - JooJ
-	
-(X) Estrutura inicial (classes, métodos, etc)
-(X) Criar e exibir os labirintos
-	(X) Ler uma matriz de um arquivo
-	(+/-) Gerar labirinto ---> não precisa, se sobrar tempo no final nós fazemos
-( ) Implementar busca cega --> aprimoramento iterativo
+
+T2 - Entrega 28/03
+(X) Implementar busca cega --> aprimoramento iterativo
 ( ) Implementar busca heurística --> A*
+( ) Comparar número de estados que cada busca usa durante a execução
+	- Dá pra ir incrementando um contador e exibir no final
+	- Também é interessante imprimir o número de estados total (tamanho do grafo de estados)
+(X) Gerar labirinto (nem precisava, mas é legal e ajuda a testar)
