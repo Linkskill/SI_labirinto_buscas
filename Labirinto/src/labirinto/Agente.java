@@ -30,13 +30,26 @@ public class Agente {
         solucao = new ArrayList<>();
     }
     public void run(){
+        System.out.println("Montando grafo de estados...");
         boolean temSolucao = montaGrafoEstados(estadoAtual);
         if(!temSolucao) {
-            System.out.println("Não é possível chegar do início até a saída.");
+            System.err.println("Não é possível chegar do início até a saída.");
+            System.err.println("Certifique-se de que há um caminho de 0s ligando"
+                    + "'S' e 'E' e tente novamente!");
             System.exit(-1);
         }
+        System.out.print("Procurando solução...");
         aprofundamentoIterativo(grafoEstados.get(0));
-        walkSolution();
+        System.out.println("Encontrada!");
+        
+        System.out.println("Percorrendo caminho...");
+        walkThroughSolution();
+        System.out.println("Número de passos dados: " + (solucao.size()-1));
+        //-1 pois a solução inclui o estado inicial
+
+        for (Estado e : solucao)
+            System.out.print(e + " ");
+        System.out.println();
     }
     /**
      * Monta o grafo de estados do ambiente, partindo do estado inicial.
@@ -46,13 +59,12 @@ public class Agente {
      *         contrário.
      */
     private boolean montaGrafoEstados(Estado start){
-        List<Estado> fila = new LinkedList<>(); /* Fila de nós que ainda falta
-                                                colocar no grafo */
-        fila.add(start);
-
+        List<Estado> fila = new LinkedList<>(); /* Estados que não estão no grafo */
         List<Posicao> posicoes;
         Estado atual;
         boolean isAlreadyOnGraph;
+        
+        fila.add(start);
         while(!fila.isEmpty())
         {
             /* Tira um estado da fila, cria a lista de
@@ -73,7 +85,7 @@ public class Agente {
                     }
                 
                 /* Se ainda não há nenhum estado no grafo com essa
-                posição, cria um novo estado. */
+                posição, cria um novo estado e coloca na fila. */
                 if(!isAlreadyOnGraph) {
                     Estado novo = new Estado(p, labirinto);
                     atual.getAdjascentes().add(novo);
@@ -83,10 +95,12 @@ public class Agente {
             grafoEstados.add(atual);
         }
 
-        /* Confere se o estado final foi colocado no grafo */
-        for (Estado e : grafoEstados)
-            if(e.equals(labirinto.getExit()))
-                return true;
+        /* Confere se o estado final foi colocado no grafo.
+            Podemos usar o contains() pois ele chama o equals(),
+        que nós demos Override para dizer que um estado é
+        igual a outro se o atributo posição for igual. */
+        if(grafoEstados.contains(labirinto.getExit()))
+            return true;
         return false;
     }
 
@@ -98,22 +112,12 @@ public class Agente {
      */
     public void aprofundamentoIterativo(Estado inicial)
     {
-        /* Solução não é ótima como deveria ser. Tem alguma coisa
-        errada na lógica. Com certeza está marcando os vértices como
-        visitados quando não deveria.
-        No 1.txt tá achando slução com 9 passos, quando a melhor é 7 */
         boolean achouSaida;
         for(int i=1; i < grafoEstados.size(); i++)
         {
-            System.out.println("i=" + i);
-            /* Em cada iteração, marca todo vértice como não visitado */
-            for(Estado e : grafoEstados)
-                e.setVisited(false);
-            
             achouSaida = LimitedDFS(inicial, i);
             if (achouSaida)
                 break;
-            System.out.println("\n");
         }
         /* Como a lista foi preenchida da exit para o spawn,
         é necessário inverter a ordem dos passos para que o
@@ -129,8 +133,9 @@ public class Agente {
      */
     private boolean LimitedDFS(Estado estado, int profMax)
     {
-        System.out.print(estado + " " + profMax + " ");
-        boolean achouSaida = false;
+        boolean achouSaida;
+
+        estado.setVisited(true);
         if(profMax >= 1) {
             for(Estado e : estado.getAdjascentes())
                 if(!e.isVisited()) {
@@ -140,34 +145,43 @@ public class Agente {
                         return true;
                     }
                 }
-            estado.setVisited(true);
         } else { //profMax == 0
             /* Se achou a saída, vai saindo na recursão e adicionando os
             estados daquele ramo (ie. o caminho até a saída) na solução. */
-            if(estado.equals(labirinto.getExit()))
-            {
+            if(estado.equals(labirinto.getExit())) {
                 solucao.add(estado);
                 return true;
             }
         }
+        /* Quando for voltar um nível da recursão, desvisita o nó.
+        Se não fizer isso, o algoritmo pode não encontrar a solução
+        ótima. Por exemplo:
+        A -- B
+          \  |
+            C -- D
+        i=2: Visita A chama recursivo para B, visita B, chama recursivo para
+             C, visita C, volta pra B, volta pra A --> C já foi visitado, A não
+             considera o caminho A--C--D
+        */
+        estado.setVisited(false);
         return false;
     }
     public void AEstrela()
     {
+
+
+
+
+
         
     }
     
-    public void walkSolution(){
+    public void walkThroughSolution(){
         for(Estado e : solucao)
         {
             move(e);
             labirinto.show();
         }
-        System.out.println("Resolvido!");
-        System.out.println(solucao.size() + " passos");
-        //System.out.println("Solucao (y,x):");
-        //for (Posicao p : solucao){
-        //    System.out.print(p + " ");
     }
     private void move(Estado e){
         estadoAtual = e;

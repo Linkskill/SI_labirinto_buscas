@@ -10,8 +10,8 @@ package labirinto;
  * @author Saphira
  */
 public class Posicao {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
     
     public Posicao(int y, int x){
         this.y = y;

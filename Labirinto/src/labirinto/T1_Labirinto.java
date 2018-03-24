@@ -28,11 +28,12 @@ public class T1_Labirinto {
         System.out.println("(2) Randomizado");
         char option = input.next().charAt(0);
         
+        System.out.println();
         if (option == '1') {
-            System.out.println("Para isso é necessário um arquivo de texto contendo a matriz.");
-            System.out.println("- A primeira linha do arquivo deve conter 2 números, "
-                    + "representando o número de linhas e de colunas do labirinto.");
-            System.out.println("- As próximas linhas devem conter a matriz "
+            System.out.println("A primeira linha do arquivo deve conter 2 "
+                    + "números no formato (N M), representando o número de "
+                    + "linhas e colunas do labirinto.");
+            System.out.println("As próximas N linhas devem conter a matriz "
                     + "propriamente dita, obedecendo a seguinte legenda:");
             System.out.println(" 0 - caminho");
             System.out.println(" 1 - parede");
@@ -44,11 +45,13 @@ public class T1_Labirinto {
             
             matrix = getMatrixFromFile(filename);
         } else if (option == '2') {
-            System.out.println("Tamanho (Y X): ");
+            System.out.println("N = número de linhas");
+            System.out.println("M = número de colunas");
+            System.out.println("Tamanho (N M):");
             int y = input.nextInt();
             int x = input.nextInt();
-            
-            matrix = Labirinto.genMatrix(y, x);
+            System.out.println();
+            System.out.println("Gerando matriz de " +y+ "x" +x+ "...");            matrix = Labirinto.genMatrix(y, x);
         } else {
             System.out.println("Opcao invalida. Saindo...");
             System.exit(3);
@@ -56,12 +59,14 @@ public class T1_Labirinto {
         lab = new Labirinto(matrix.length, matrix[0].length, matrix);
         lab.show();
         
+        System.out.println("Inserindo agente...");
         Agente agente = new Agente(lab);
         agente.run();
     }
 
     public static char[][] getMatrixFromFile(String filename){
         char[][] matrix = null;
+        boolean inicio=false, fim=false;
         try {
             BufferedReader file = new BufferedReader(new FileReader(filename));
             
@@ -78,14 +83,28 @@ public class T1_Labirinto {
             {
                 line = file.readLine().replace(" ", "");
                 for(int j=0; j < largura; j++)
+                {
                     matrix[i][j] = line.charAt(j);
+                    if(matrix[i][j] == 'S')
+                        inicio = true;
+                    else if (matrix[i][j] == 'E')
+                        fim = true;
+                }
             }
+            if(!inicio || !fim) {
+                System.out.println("Ponto de início ou fim não reconhecidos.");
+                System.out.println("Verifique se a matriz do seu arquivo possui "
+                        + "exatamente um 'S' e um 'E' e tente novamente.");
+                System.exit(3);
+            }
+                
+                
         } catch (FileNotFoundException ex) {
-            System.out.println("Arquivo não encontrado!");
+            System.err.println("Arquivo não encontrado!");
             System.exit(1);
         } catch (IOException ex) {
-            System.out.println("Problema no readLine.");
-            System.out.println("Arquivo vazio ou número de linhas na matriz "
+            System.err.println("Problema no readLine.");
+            System.err.println("Arquivo vazio ou número de linhas na matriz "
                     + "não condiz com o especificado na primeira linha do "
                     + "arquivo.");
             System.out.println("Saindo...");
