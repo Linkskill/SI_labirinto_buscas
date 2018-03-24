@@ -28,10 +28,10 @@ public class T1_Labirinto {
         System.out.println("(2) Randomizado");
         char option = input.next().charAt(0);
         
-        if (option == '1'){
+        if (option == '1') {
             System.out.println("Para isso é necessário um arquivo de texto contendo a matriz.");
             System.out.println("- A primeira linha do arquivo deve conter 2 números, "
-                    + "representando a largura e a altura do labirinto.");
+                    + "representando o número de linhas e de colunas do labirinto.");
             System.out.println("- As próximas linhas devem conter a matriz "
                     + "propriamente dita, obedecendo a seguinte legenda:");
             System.out.println(" 0 - caminho");
@@ -43,19 +43,17 @@ public class T1_Labirinto {
             String filename = input.next();
             
             matrix = getMatrixFromFile(filename);
-        }
-        else if (option == '2'){
-            System.out.println("Tamanho (X Y): ");
-            int x = input.nextInt();
+        } else if (option == '2') {
+            System.out.println("Tamanho (Y X): ");
             int y = input.nextInt();
+            int x = input.nextInt();
             
-            matrix = Labirinto.genMatrix(x, y);
-        }
-        else{
+            matrix = Labirinto.genMatrix(y, x);
+        } else {
             System.out.println("Opcao invalida. Saindo...");
             System.exit(3);
         }
-        lab = new Labirinto(matrix[0].length, matrix.length, matrix);
+        lab = new Labirinto(matrix.length, matrix[0].length, matrix);
         lab.show();
         
         Agente agente = new Agente(lab);
@@ -69,14 +67,15 @@ public class T1_Labirinto {
             
             /* Lê as dimensões da matriz */
             String[] dimensions = file.readLine().split(" ");
-            int largura = Integer.parseInt(dimensions[0]);
-            int altura = Integer.parseInt(dimensions[1]);
+            int altura = Integer.parseInt(dimensions[0]);
+            int largura = Integer.parseInt(dimensions[1]);
 
             matrix = new char[altura][largura];
             
             /* Lê os caracteres (ignorando espaços) e coloca na matriz */
             String line;
-            for(int i=0; i < altura; i++){
+            for(int i=0; i < altura; i++)
+            {
                 line = file.readLine().replace(" ", "");
                 for(int j=0; j < largura; j++)
                     matrix[i][j] = line.charAt(j);

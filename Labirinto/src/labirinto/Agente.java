@@ -7,6 +7,7 @@ package labirinto;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -17,13 +18,7 @@ public class Agente {
     private Labirinto labirinto; //Associação com um labirinto
     private Estado estadoAtual;
     private List<Estado> grafoEstados;
-    private List<Posicao> solucao;
-    /* OU lista de estados */
-    
-    /* Um estado é representado por posição atual e matriz com
-    os obstáculos e objetivos.
-        Não é necessário alocar uma grid ou labirinto novo para
-    cada estado, basta salvar a posição do agente. */
+    private List<Estado> solucao;
     
     public Agente(Labirinto lab){
         //associação bidirecional entre labirinto e agente
@@ -31,119 +26,153 @@ public class Agente {
         labirinto.setAgente(this);
         
         estadoAtual = labirinto.getStart();
+        grafoEstados = new ArrayList<>();
         solucao = new ArrayList<>();
     }
     public void run(){
-        grafoEstados = montaGrafo(estadoAtual);
+        boolean temSolucao = montaGrafoEstados(estadoAtual);
+        if(!temSolucao) {
+            System.out.println("Não é possível chegar do início até a saída.");
+            System.exit(-1);
+        }
+        aprofundamentoIterativo(grafoEstados.get(0));
+        walkSolution();
     }
-        
-    private List<Estado> montaGrafo(Estado start){
-        List<Estado> fila = new LinkedList<>(); //Fila de nós que ainda falta
-        //colocar no grafo
-        
-        /* Coloca os vizinhos do estado inicial na lista */
-        List<Posicao> posicoes = start.calculaPosicoesPossiveis();
-        for (Posicao p : posicoes)
-            start.getEstadosPossiveis().add(new Estado(p, labirinto));
-        grafoEstados.add(start);
+    /**
+     * Monta o grafo de estados do ambiente, partindo do estado inicial.
+     * @param start Estado inicial
+     * @return true se é o labirinto tem solução (existe ao menos
+     *         um caminho entre o inicio e a saída), false caso
+     *         contrário.
+     */
+    private boolean montaGrafoEstados(Estado start){
+        List<Estado> fila = new LinkedList<>(); /* Fila de nós que ainda falta
+                                                colocar no grafo */
+        fila.add(start);
 
-        for (Posicao p : posicoes)
-            fila.add(new Estado(p,labirinto));
-        
+        List<Posicao> posicoes;
         Estado atual;
+        boolean isAlreadyOnGraph;
         while(!fila.isEmpty())
         {
-            /* Tira um estado da fila (ie. um estado que não está no grafo)
-            cria a lista de adjascências desse estado e coloca ele no grafo.*/
+            /* Tira um estado da fila, cria a lista de
+            adjascências dele e o coloca no grafo.*/
             atual = fila.remove(0);
             posicoes = atual.calculaPosicoesPossiveis();
-
-            boolean isAlreadyOnGraph;
             for (Posicao p : posicoes)
             {
-                /* Se já existe um estado com essa mesma posição, referencia à
-                este objeto ao invés de criar um novo. */
+                /* Se já existe um estado com essa mesma posição
+                no grafo, referencia à este mesmo objeto ao invés
+                de criar um novo. */
                 isAlreadyOnGraph = false;
                 for (Estado e : grafoEstados)
-                {
-                    if(p.equals(e.getPosicao()))
-                    {
+                    if(e.getPosicao().equals(p)) {
                         isAlreadyOnGraph = true;
-                        atual.getEstadosPossiveis().add(e);
+                        atual.getAdjascentes().add(e);
                         break;
                     }
+                
+                /* Se ainda não há nenhum estado no grafo com essa
+                posição, cria um novo estado. */
+                if(!isAlreadyOnGraph) {
+                    Estado novo = new Estado(p, labirinto);
+                    atual.getAdjascentes().add(novo);
+                    fila.add(novo);
                 }
-                /* Se não está no grafo,
-                if(!isAlreadyOnGraph)
-                    atual.getEstadosPossiveis().add(new Estado(p,labirinto));
             }
             grafoEstados.add(atual);
         }
+
+        /* Confere se o estado final foi colocado no grafo */
+        for (Estado e : grafoEstados)
+            if(e.equals(labirinto.getExit()))
+                return true;
+        return false;
     }
-    
-    
-    public void move(){
-        /* Enquanto o nosso agente é burro, faz apenas alguns
-        movimentos (se ele não resolveu nesse tempo, é provável
-        que nem consiga resolver). 
-            Depois, quando nós implementarmos as buscas, vai ser
-        algo do tipo:
-        while(posicaoAtual != labirinto.getExit()){
-            deliberar();
-            labirinto.show();
-        }*/
-        
-        for(int i=0; i < 15; i++){
-            deliberar();
-            labirinto.show();
-            if (posicaoAtual.equals(labirinto.getExit())){
-                System.out.println("Resolvido!");
-                //System.out.println("Solucao (y,x):");
-                //for (Posicao p : caminhoPercorrido){
-                //    System.out.print(p + " ");
+
+    /**
+     * Faz DFS com diferentes profundidades máximas.
+     * Ao terminar, o atributo solucao contem a lista de estados
+     * pelos quais é necessário passar para chegar a saída.
+     * @param inicial Estado inicial
+     */
+    public void aprofundamentoIterativo(Estado inicial)
+    {
+        /* Solução não é ótima como deveria ser. Tem alguma coisa
+        errada na lógica. Com certeza está marcando os vértices como
+        visitados quando não deveria.
+        No 1.txt tá achando slução com 9 passos, quando a melhor é 7 */
+        boolean achouSaida;
+        for(int i=1; i < grafoEstados.size(); i++)
+        {
+            System.out.println("i=" + i);
+            /* Em cada iteração, marca todo vértice como não visitado */
+            for(Estado e : grafoEstados)
+                e.setVisited(false);
+            
+            achouSaida = LimitedDFS(inicial, i);
+            if (achouSaida)
                 break;
+            System.out.println("\n");
+        }
+        /* Como a lista foi preenchida da exit para o spawn,
+        é necessário inverter a ordem dos passos para que o
+        agente ande do spawn até a exit. */
+        Collections.reverse(solucao);
+    }
+    /**
+     * Depth First Search (busca em profundidade).
+     * @param estado Estado que está sendo visitado no momento
+     * @param profMax Profundidade máxima para realizar a busca, contando
+     *                a partir do estado passado por parâmetro
+     * @return true se achou a saída naquele ramo, false caso contrário
+     */
+    private boolean LimitedDFS(Estado estado, int profMax)
+    {
+        System.out.print(estado + " " + profMax + " ");
+        boolean achouSaida = false;
+        if(profMax >= 1) {
+            for(Estado e : estado.getAdjascentes())
+                if(!e.isVisited()) {
+                    achouSaida = LimitedDFS(e, profMax-1);
+                    if (achouSaida) {
+                        solucao.add(estado);
+                        return true;
+                    }
+                }
+            estado.setVisited(true);
+        } else { //profMax == 0
+            /* Se achou a saída, vai saindo na recursão e adicionando os
+            estados daquele ramo (ie. o caminho até a saída) na solução. */
+            if(estado.equals(labirinto.getExit()))
+            {
+                solucao.add(estado);
+                return true;
             }
         }
+        return false;
+    }
+    public void AEstrela()
+    {
         
     }
-
-    /* */
-    public void deliberar() {
-        //Decide o próximo lugar para onde ir
-
-        /* Por enquanto o agente é bem "burro", ele só vê se pode
-        ir para cima, se não der tenta ir pra cima-direita, senão
-        direita... todas as 8 direções possíveis */
-        int x = posicaoAtual.getX();
-        int y = posicaoAtual.getY();
-        Posicao decisao=null;
-        if(labirinto.isAccessible(y-1, x)) //up
-            decisao = new Posicao(y-1, x);
-        else if (labirinto.isAccessible(y-1, x+1)) //up-right
-            decisao = new Posicao(y-1, x+1);
-        else if (labirinto.isAccessible(y, x+1)) //right
-            decisao = new Posicao(y, x+1);
-        else if (labirinto.isAccessible(y+1, x+1)) //down-right
-            decisao = new Posicao(y+1, x+1);
-        else if (labirinto.isAccessible(y+1, x)) //down
-            decisao = new Posicao(y+1, x);
-        else if (labirinto.isAccessible(y+1, x-1)) //down-left
-            decisao = new Posicao(y+1, x-1);
-        else if (labirinto.isAccessible(y, x-1)) //left
-            decisao = new Posicao(y, x-1);
-        else if (labirinto.isAccessible(y-1, x-1)) //up-left
-            decisao = new Posicao(y-1, x-1);
-        
-        //Quanto tiver as buscas vai ser algo como
-        //Posicao decisao = busca();
-        
-        solucao.add(decisao);
-        posicaoAtual = decisao;
+    
+    public void walkSolution(){
+        for(Estado e : solucao)
+        {
+            move(e);
+            labirinto.show();
+        }
+        System.out.println("Resolvido!");
+        System.out.println(solucao.size() + " passos");
+        //System.out.println("Solucao (y,x):");
+        //for (Posicao p : solucao){
+        //    System.out.print(p + " ");
     }
-    public int getXAtual(){
-        return xAtual;
+    private void move(Estado e){
+        estadoAtual = e;
     }
-    public int getYAtual(){
-        return yAtual;
+    public Estado getEstadoAtual(){
+        return estadoAtual;
     }
 }

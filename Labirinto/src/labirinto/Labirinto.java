@@ -19,14 +19,12 @@ public class Labirinto {
     private final int largura;
     private final int altura;
     private char[][] cells;
-    /* O 'A' (representação do agente) só aparece na matriz durante
-    as impressões. */
     private Agente agente;
 
     private Estado start;
     private Estado exit;
     
-    public Labirinto (int larg, int alt, char[][] matrix){
+    public Labirinto (int alt, int larg, char[][] matrix){
         largura = larg;
         altura = alt;
         cells = matrix;
@@ -44,8 +42,12 @@ public class Labirinto {
     
     /** Adaptação do Algoritmo de Prim Randomizado
      * https://en.wikipedia.org/wiki/Maze_generation_algorithm
+     * @param larg Largura da matriz a ser gerada.
+     * @param alt Altura da matriz a ser gerada.
+     * @return Matriz de chars onde '1' significa parede
+     *         e '0' significa caminho.
      */
-    public static char[][] genMatrix(int larg, int alt){
+    public static char[][] genMatrix(int alt, int larg){
         Random rand = new Random();
         char[][] auxGrid = new char[alt][larg];
         
@@ -104,12 +106,16 @@ public class Labirinto {
         return auxGrid;
     }
     
+    /**
+     * Posiciona o agente na matriz (se ele existir)
+     * e chama o método print()..
+     */
     public void show(){
-        if(agente != null){
+        if(agente != null) {
             /* Antes de imprimir coloca o agente na matriz. Depois
             retorna ela à representação original. */
-            int xAtual = agente.getXAtual();
-            int yAtual = agente.getYAtual();
+            int xAtual = agente.getEstadoAtual().getPosicao().getX();
+            int yAtual = agente.getEstadoAtual().getPosicao().getY();
             char original = cells[yAtual][xAtual];
             cells[yAtual][xAtual] = 'A';
             print();
@@ -120,7 +126,14 @@ public class Labirinto {
             print();
         }
     }
-    
+    /**
+     * Imprime o labirinto.
+     *   "   " = posição acessível
+     *   "XXX" = parede
+     *   " S " = start
+     *   " E " = exist
+     *   " A " = agente
+     */
     private void print(){
         String linhaSeparadora = "+";
         for(int j=0; j < largura; j++)
@@ -152,7 +165,12 @@ public class Labirinto {
             System.out.println(linhaSeparadora);
         }
     }
-
+    /** 
+     * @param row linha a ser verificada
+     * @param col coluna a ser verificada
+     * @return true se cells[row][col] é um caminho percorrível
+     *         false caso sontrário
+     */
     public boolean isAccessible(int row, int col) {
          /* Se estiver saindo dos limites do labirinto ou for
          uma parede, não pode ir para aquela posição. */

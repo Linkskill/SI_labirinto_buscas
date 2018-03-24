@@ -28,9 +28,9 @@ public class Posicao {
             return true;
         return false;
     }
-    /* Netbeans gera sozinho, é necessário pra dar override no equals */
     @Override
     public int hashCode() {
+        //Sempre que der Override no equals() precisa dar no hashCode() também
         int hash = 7;
         hash = 59 * hash + this.x;
         hash = 59 * hash + this.y;
