@@ -14,7 +14,7 @@ T1 - Entrega 21/03
 
 T2 - Entrega 28/03
 (X) Implementar busca cega --> aprimoramento iterativo
-( ) Implementar busca heurística --> A*
+(X) Implementar busca heurística --> A* -> JOOJ
 ( ) Comparar número de estados que cada busca usa durante a execução
 	- Dá pra ir incrementando um contador e exibir no final
 	- Também é interessante imprimir o número de estados total (tamanho do grafo de estados)
