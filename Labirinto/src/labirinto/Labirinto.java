@@ -5,8 +5,9 @@
  */
 package labirinto;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -14,39 +15,50 @@ import java.util.Random;
  * @author Saphira
  */
 public class Labirinto {
-    private final int largura;
     private final int altura;
+    private final int largura;
     private char[][] cells;
     private Agente agente;
-
     private Estado start;
     private Estado exit;
     
     public Labirinto (int alt, int larg, char[][] matrix){
-        largura = larg;
         altura = alt;
+        largura = larg;
         cells = matrix;
-        /* Salva a posição de spawn e final para acesso fácil posteriormente */
+        /* Salva o ponto de start e exit para fácil acesso */
         for(int i=0; i < altura; i++)
             for(int j=0; j < largura; j++)
-            {
                 if(cells[i][j] == 'S') 
-                    start = new Estado(new Posicao(i, j), this);
+                    start = new Estado(i, j);
                 else if(cells[i][j] == 'E')
-                    exit = new Estado(new Posicao(i, j), this);
-            }
+                    exit = new Estado(i, j);
+        agente = null;
+    }
+    public Labirinto (int alt, int larg){
+        altura = alt;
+        largura = larg;
+        cells = geraMatrizPrim(alt, larg);
+        /* Salva o ponto de start e exit para fácil acesso */
+        for(int i=0; i < altura; i++)
+            for(int j=0; j < largura; j++)
+                if(cells[i][j] == 'S') 
+                    start = new Estado(i, j);
+                else if(cells[i][j] == 'E')
+                    exit = new Estado(i, j);
         agente = null;
     }
     /**
-     * Posiciona o agente na matriz (se ele existir)
-     * e chama o método print()..
+     * Posiciona o agente na matriz (se existir
+     * um agente) e chama o método print().
      */
     public void show(){
         if(agente != null) {
             /* Antes de imprimir coloca o agente na matriz. Depois
             retorna ela à representação original. */
-            int xAtual = agente.getEstadoAtual().getPosicao().getX();
-            int yAtual = agente.getEstadoAtual().getPosicao().getY();
+            int xAtual = agente.getEstadoAtual().getX();
+            int yAtual = agente.getEstadoAtual().getY();
+
             char original = cells[yAtual][xAtual];
             cells[yAtual][xAtual] = 'A';
             print();
@@ -58,7 +70,8 @@ public class Labirinto {
         }
     }
     /**
-     * Imprime o labirinto.
+     * Imprime a grid do labirinto.
+     * Legenda:
      *   "   " = posição acessível
      *   "XXX" = parede
      *   " S " = start
@@ -96,49 +109,64 @@ public class Labirinto {
         }
         System.out.println();
     }
+    /**
+     * Para cada vizinho acessível, salva o estado
+     * correspondente em uma lista, caso contrário
+     * ignora.
+     * @param row Linha/coordenada y a ser avaliada
+     * @param col Coluna/coordenada x a ser avaliada
+     * @return Lista de estados representando os destinos possíveis.
+     */
+    public List<Estado> calculaEstadosPossiveis(int row, int col) {
+        List<Estado> estados = new ArrayList<>();
+        boolean isCoordinate;
+        
+        for(int i=row-1; i <= row+1; i++)
+            for(int j=col-1; j <= col+1; j++)
+            {
+                isCoordinate = (i == row && j == col);
+                if (!isCoordinate && isAccessible(i, j))
+                    estados.add(new Estado(i, j));
+            }
+        return estados;
+    }
     /** 
-     * @param row linha a ser verificada
-     * @param col coluna a ser verificada
-     * @return true se cells[row][col] é um caminho percorrível
-     *         false caso sontrário
+     * Indica se a posição (row,col) na grid é acessível.
+     * @param row Linha a ser analisada.
+     * @param col Coluna a ser analisada.
+     * @return True se cells[row][col] não for uma parede
+     *         nem estiver fora dos limites, false caso
+     *         contrário.
      */
     public boolean isAccessible(int row, int col) {
-         /* Se estiver saindo dos limites do labirinto ou for
-         uma parede, não pode ir para aquela posição. */
         if(row < 0 || col < 0 || row >= altura || col >= largura
             || cells[row][col] == '1')
             return false;
         return true;
     }
-
     public void setAgente(Agente a){
         agente = a;
     }
-    public Estado getStart(){
-        return start;
-    }
-    public Estado getExit(){
-        return exit;
-    }
-    public char[][] getCells(){
-        return cells;
-    }
+    public Estado getStart(){ return start; }
+    public Estado getExit() { return exit; }
+    public char[][] getCells(){ return cells; }
+
     /** Adaptação do Algoritmo de Prim Randomizado
      * https://en.wikipedia.org/wiki/Maze_generation_algorithm.
      * http://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm
      *     A implementação é um pouco diferente por estarmos lidando
-     * com paredes que são células, e não paredes entre-células. A
-     * principal diferença é o fato do termo "célula-vizinha" significar
-     * com distância 2. Ou seja, dado uma célula cells[y][x], suas
-     * células vizinhas são: cells[y-2][x], cells[y+2][x],
-     * cells[y][x-2] e cells[y][x+2]
-     * 
+     * com paredes que são células, e não paredes entre-células.
+     * A principal diferença é o fato do termo "célula-vizinha"
+     * significar com distância 2. Ou seja, dado uma célula
+     * cells[y][x], suas células vizinhas são: cells[y-2][x],
+     * cells[y+2][x], cells[y][x-2] e cells[y][x+2].
      * @param larg Largura da matriz a ser gerada.
      * @param alt Altura da matriz a ser gerada.
-     * @return Matriz de chars onde '1' significa parede
-     *         e '0' significa caminho.
+     * @return Matriz de chars onde '1' significa parede,
+     *         '0' significa caminho, 'S' significa início
+     *         e 'E' significa saída.
      */
-    public static char[][] genMatrix(int alt, int larg){
+    public static char[][] geraMatrizPrim(int alt, int larg){
         Random rand = new Random();
         char[][] auxGrid = new char[alt][larg];
         
@@ -156,20 +184,20 @@ public class Labirinto {
         xStart = rand.nextInt(larg);
         auxGrid[yStart][xStart]= 'S';
 
-        List<Posicao> fronteiras = new LinkedList<>();
+        List<Coordenada> fronteiras = new LinkedList<>();
         if (yStart-2 >= 0 && auxGrid[yStart-2][xStart] == '1')
-            fronteiras.add(new Posicao(yStart-2, xStart));
+            fronteiras.add(new Coordenada(yStart-2, xStart));
         if (yStart+2 < alt && auxGrid[yStart+2][xStart] == '1')
-            fronteiras.add(new Posicao(yStart+2, xStart));
+            fronteiras.add(new Coordenada(yStart+2, xStart));
         if (xStart-2 >= 0 && auxGrid[yStart][xStart-2] == '1')
-            fronteiras.add(new Posicao(yStart, xStart-2));
+            fronteiras.add(new Coordenada(yStart, xStart-2));
         if (xStart+2 < larg && auxGrid[yStart][xStart+2] == '1')
-            fronteiras.add(new Posicao(yStart, xStart+2));
+            fronteiras.add(new Coordenada(yStart, xStart+2));
         
         int x, y, xVizinho, yVizinho;
-        Posicao atual, vizinho;
-        List<Posicao> vizinhosAcessiveis = new LinkedList<>();
-        List<Posicao> paredesVizinhas = new LinkedList<>();
+        Coordenada atual, vizinho;
+        List<Coordenada> vizinhosAcessiveis = new LinkedList<>();
+        List<Coordenada> paredesVizinhas = new LinkedList<>();
         while(!fronteiras.isEmpty())
         {
             /* Escolhe e remove uma parede aleatória da lista. */
@@ -183,27 +211,27 @@ public class Labirinto {
             paredesVizinhas.clear();
             if (y-2 >= 0) {
                 if (auxGrid[y-2][x] != '1')
-                    vizinhosAcessiveis.add(new Posicao(y-2, x));
+                    vizinhosAcessiveis.add(new Coordenada(y-2, x));
                 else
-                    paredesVizinhas.add(new Posicao(y-2, x));
+                    paredesVizinhas.add(new Coordenada(y-2, x));
             }
             if (y+2 < alt) {
                 if (auxGrid[y+2][x] != '1')
-                    vizinhosAcessiveis.add(new Posicao(y+2, x));
+                    vizinhosAcessiveis.add(new Coordenada(y+2, x));
                 else
-                    paredesVizinhas.add(new Posicao(y+2, x));
+                    paredesVizinhas.add(new Coordenada(y+2, x));
             }
             if (x-2 >= 0) {
                 if (auxGrid[y][x-2] != '1')
-                    vizinhosAcessiveis.add(new Posicao(y, x-2));
+                    vizinhosAcessiveis.add(new Coordenada(y, x-2));
                 else
-                    paredesVizinhas.add(new Posicao(y, x-2));
+                    paredesVizinhas.add(new Coordenada(y, x-2));
             }
             if (x+2 < larg) {
                 if (auxGrid[y][x+2] != '1')
-                    vizinhosAcessiveis.add(new Posicao(y, x+2));
+                    vizinhosAcessiveis.add(new Coordenada(y, x+2));
                 else
-                    paredesVizinhas.add(new Posicao(y, x+2));
+                    paredesVizinhas.add(new Coordenada(y, x+2));
             }
 
             /* Escolhe aleatoriamente um dos "vizinhos" acessíveis. */
@@ -219,7 +247,7 @@ public class Labirinto {
             
             /* Coloca as paredes-"vizinhas" da célula atual
             na lista de paredes, se elas já não estiverem la. */
-            for(Posicao p : paredesVizinhas)
+            for(Coordenada p : paredesVizinhas)
                 if (!fronteiras.contains(p)) //funciona por causa do override no equals
                     fronteiras.add(p);
 

@@ -44,6 +44,7 @@ public class T1_Labirinto {
             String filename = input.next();
             
             matrix = getMatrixFromFile(filename);
+            lab = new Labirinto(matrix.length, matrix[0].length, matrix);
         } else if (option == '2') {
             System.out.println("N = número de linhas");
             System.out.println("M = número de colunas");
@@ -51,14 +52,14 @@ public class T1_Labirinto {
             int y = input.nextInt();
             int x = input.nextInt();
             System.out.println();
-            System.out.println("Gerando matriz de " +y+ "x" +x+ "...");            matrix = Labirinto.genMatrix(y, x);
+            System.out.println("Gerando matriz de " +y+ "x" +x+ "...");
+            lab = new Labirinto(y, x);
         } else {
             System.out.println("Opcao invalida. Saindo...");
             System.exit(3);
         }
-        lab = new Labirinto(matrix.length, matrix[0].length, matrix);
+
         lab.show();
-        
         System.out.println("Inserindo agente...");
         Agente agente = new Agente(lab);
         agente.run();
