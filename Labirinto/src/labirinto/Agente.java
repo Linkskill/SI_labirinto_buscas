@@ -8,25 +8,28 @@ package labirinto;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 /**
  *
  * @author Saphira
  */
 public class Agente {
-    private Labirinto labirinto; //Associação com um labirinto
+    private Labirinto labirinto;
     private Estado estadoAtual;
     private GrafoEstados grafoEstados;
     private List<Estado> solucao;
+    private int numEstadosVisitadosNaBusca;
+
     
     public Agente(Labirinto lab){
-        //associação bidirecional entre labirinto e agente
         labirinto = lab; 
         labirinto.setAgente(this);
         
         estadoAtual = labirinto.getStart();
         grafoEstados = new GrafoEstados(labirinto);
         solucao = new ArrayList<>();
+        numEstadosVisitadosNaBusca = 0;
     }
     
     /**
@@ -55,6 +58,10 @@ public class Agente {
         for (Estado e : solucao)
             System.out.print(e + " ");
         System.out.println();
+        System.out.println("Número de estados no grafo de estados: "
+                            + grafoEstados.getSize());
+        System.out.println("Número de estados visitados na busca: "
+                            + numEstadosVisitadosNaBusca);
     }
 
     /**
@@ -90,10 +97,12 @@ public class Agente {
         boolean achouSaida;
 
         estado.setVisited(true);
+        numEstadosVisitadosNaBusca++;
+
         if(profMax >= 1) {
-            for(Estado e : estado.getAdjascentes())
-                if(!e.isVisited()) {
-                    achouSaida = LimitedDFS(e, profMax-1);
+            for(Edge edge : estado.getAdjascencias())
+                if(!edge.getVizinho().isVisited()) {
+                    achouSaida = LimitedDFS(edge.getVizinho(), profMax-1);
                     if (achouSaida) {
                         solucao.add(estado);
                         return true;
@@ -113,24 +122,84 @@ public class Agente {
         A -- B
           \  |
             C -- D
-        i=2: Visita A chama recursivo para B, visita B, chama recursivo para
-             C, visita C, volta pra B, volta pra A --> C já foi visitado, A não
-             considera o caminho A--C--D
+        i=2: Visita A chama recursivo para B, visita B, chama recursivo
+             para C, visita C, volta pra B, volta pra A --> C já foi
+             visitado, A não considera o caminho A--C--D
         */
         estado.setVisited(false);
         return false;
     }
     /**
-     * 
+     * Soluciona o labirinto levando em conta uma função
+     * de custo e uma função heurística.
+     * @param inicial Estado inicial
      */
-    public void AEstrela()
+    public void AEstrela(Estado inicial)
     {
+        // Estrutura para guardar as distancias até o estado final.
+        // Até pensei em colocar como atributo de Estado, mas não
+        // faz sentido já que só usa essa ideia de heurística aqui
+        HashMap<Estado, Double> valorHeuristica = new HashMap<>();
 
-
-
-
-
+        // Pré-computa as distâncias (computar elas enquanto procura
+        // pela saída pode fazer com que chame a função várias vezes
+        // para um mesmo estado (processamento desnecessário))
+        for (Estado e : grafoEstados.getEstados())
+            valorHeuristica.put(e, heuristica(e));
         
+        // Cria um heap mínimo para guardar os estados abertos -->
+        // os que ainda vamos tentar explorar
+        // Dar uma procurada em PriorityQueue do Java
+
+        // Cria uma lista para guardar os estados fechados --> os
+        //quais já verificamos todos os vizinhos
+        
+        Estado estado=null, anterior;
+
+        //Coloca o estado inicial no heap, com f=0
+        //Enquanto tem elementos no heap
+            // Extrai estado com menor f do heap
+            numEstadosVisitadosNaBusca++;
+
+            if (estado.equals(labirinto.getExit())) {
+                // Se achou a saida, salva esse caminho como a solução
+                solucao.add(estado);
+                anterior = estado.getPaiMenorCusto();
+                while(anterior != null)
+                {
+                    solucao.add(anterior);
+                    anterior = anterior.getPaiMenorCusto();
+                }
+                /* Como a lista foi preenchida da exit para o spawn,
+                é necessário inverter a ordem dos passos para que o
+                agente ande do spawn até a exit. */
+                Collections.reverse(solucao);
+                return;
+            }
+            for (Edge edge : estado.getAdjascencias())
+            {
+                // custo(vizinho) = custo(estado) + peso da aresta(estado,vizinho)
+                // f(vizinho) = custo(vizinho) + valorHeuristica(vizinho)
+
+                // if (  ???  )
+                //    atualiza menorCusto e pai do vizinho
+                //    coloca vizinho no heap
+            }
+            // Coloca E no conjunto de estados fechados
+    }
+    /**
+     * Calcula a distância euclidiana entre o estado
+     * passado por parâmetro e o final.
+     * @param e Estado que terá a distância calculada.
+     * @return Distância euclidiana entre o estado
+     *         e o estado final.
+     */
+    private double heuristica (Estado e){
+        int x1 = e.getX();
+        int y1 = e.getY();
+        int x2 = labirinto.getExit().getX();
+        int y2 = labirinto.getExit().getY();
+        return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
     }
     /**
      * Faz o agente percorrer a solução encontrada.

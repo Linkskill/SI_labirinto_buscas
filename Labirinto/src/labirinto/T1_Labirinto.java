@@ -56,7 +56,7 @@ public class T1_Labirinto {
             lab = new Labirinto(y, x);
         } else {
             System.out.println("Opcao invalida. Saindo...");
-            System.exit(3);
+            System.exit(1);
         }
 
         lab.show();
@@ -96,20 +96,18 @@ public class T1_Labirinto {
                 System.out.println("Ponto de início ou fim não reconhecidos.");
                 System.out.println("Verifique se a matriz do seu arquivo possui "
                         + "exatamente um 'S' e um 'E' e tente novamente.");
-                System.exit(3);
+                System.exit(4);
             }
-                
-                
         } catch (FileNotFoundException ex) {
             System.err.println("Arquivo não encontrado!");
-            System.exit(1);
+            System.exit(2);
         } catch (IOException ex) {
             System.err.println("Problema no readLine.");
             System.err.println("Arquivo vazio ou número de linhas na matriz "
                     + "não condiz com o especificado na primeira linha do "
                     + "arquivo.");
             System.out.println("Saindo...");
-            System.exit(2);
+            System.exit(3);
         }
         return matrix;
     }

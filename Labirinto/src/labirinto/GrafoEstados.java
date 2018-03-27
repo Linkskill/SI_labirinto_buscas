@@ -14,11 +14,11 @@ import java.util.List;
  * @author Saphira
  */
 public class GrafoEstados {
-    private List<Estado> listaVertices;
+    private List<Estado> estados;
     private final Labirinto labirinto;
 
     public GrafoEstados(Labirinto lab){
-        listaVertices = new ArrayList<>();
+        estados = new ArrayList<>();
         labirinto = lab;
     }
     /** 
@@ -34,45 +34,55 @@ public class GrafoEstados {
         {
             estadoAtual = fila.remove(0);
             calculaAdjascencias(estadoAtual, fila);
-            listaVertices.add(estadoAtual);
+            estados.add(estadoAtual);
         }
     }
     /** 
      * Calcula as adjascências de um estado no grafo.
      * @param estado Estado a ter as adjascências calculadas.
-     * @param fila Fila para colocar os adjascentes que não 
-     *        estão no grafo.
+     * @param fila Fila para colocar os estados adjascentes
+     *        que ainda não estão no grafo.
      */
     private void calculaAdjascencias(Estado estado, List<Estado> fila){
         int x = estado.getX();
         int y = estado.getY();
-        List<Estado> vizinhos = labirinto.calculaEstadosPossiveis(y, x);
+        List<Estado> vizinhos = labirinto.retornaEstadosPossiveis(estado);
         Estado vertice;
 
+        boolean estaNoGrafo, estaNaFila;
         for (Estado vizinho : vizinhos)
         {
-            vertice = getVertice(vizinho);
-            if (vertice == null) {
-                estado.getAdjascentes().add(vizinho);
+            estaNoGrafo = estados.indexOf(vizinho) != -1;
+            estaNaFila = fila.indexOf(vizinho) != -1;
+            // Se vizinho já está no grafo ou na fila,
+            // referencia ele ao invés de criar um novo
+            if (estaNoGrafo) {
+                vertice = estados.get(estados.indexOf(vizinho));
+                estado.adicionarAdjascencia(vertice, 1);
+            } else if (estaNaFila) {
+                vertice = fila.get(fila.indexOf(vizinho));
+                estado.adicionarAdjascencia(vertice, 1);
+            } else {
+                estado.adicionarAdjascencia(vizinho, 1);
                 fila.add(vizinho);
-            } else
-                estado.getAdjascentes().add(vertice);
+            }
         }
     }
     /** 
-     * Retorna o vértice passado por parâmetro.
+     * Procura por um vértice igual ao passado por
+     * parâmetro no grafo.
      * @param estado Vértice a ser procurado.
      * @return Vértice v se encontrou no grafo,
      *         null caso contrário.
      */
-    public Estado getVertice(Estado estado){
-        for (Estado v : listaVertices)
-            if(estado.equals(v))
-                return v;
+    public Estado getEstado(Estado estado){
+        for (Estado e : estados)
+            if(estado.equals(e))
+                return e;
         return null;
     }
-    public List<Estado> getListaVertices() { return listaVertices; }
-    public int getSize(){ return listaVertices.size(); }
+    public List<Estado> getEstados() { return estados; }
+    public int getSize(){ return estados.size(); }
     /** 
      * Verifica se o labirinto tem solução.
      * @param estadoFinal Estado final do ambiente.
@@ -83,7 +93,7 @@ public class GrafoEstados {
         /* Podemos usar o contains() pois ele chama o equals(),
         que nós demos Override para dizer que um estado é
         igual a outro se o atributo posição for igual. */
-        if(listaVertices.contains(estadoFinal))
+        if(estados.contains(estadoFinal))
             return true;
         return false;
     }

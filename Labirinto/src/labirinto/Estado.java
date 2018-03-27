@@ -14,14 +14,21 @@ import java.util.Objects;
  * @author Saphira
  */
 public class Estado {
-    private Coordenada coordenada;
-    private List<Estado> adjascentes;
+    private final Coordenada coordenada;
+    private List<Edge> adjascencias;
     private boolean visited;
+    private int menorCusto;
+    private Estado paiMenorCusto;
     
     public Estado (int y, int x){
         coordenada = new Coordenada(y, x);
-        adjascentes = new LinkedList<>();
+        adjascencias = new LinkedList<>();
         visited = false;
+        menorCusto = Integer.MAX_VALUE;
+        paiMenorCusto = null;
+    }
+    public void adicionarAdjascencia(Estado e, int custo){
+        adjascencias.add(new Edge(e, custo));
     }
     public void setVisited(boolean b){
         visited = b;
@@ -29,10 +36,18 @@ public class Estado {
     public boolean isVisited(){
         return visited;
     }
+    public void setMenorCusto(int menorCusto) {
+        this.menorCusto = menorCusto;
+    }
+    public void setPaiMenorCusto(Estado paiMenorCusto) {
+        this.paiMenorCusto = paiMenorCusto;
+    }
     public int getY() { return coordenada.getY(); }
     public int getX() { return coordenada.getX(); }
     public Coordenada getCoordenada() { return coordenada; }
-    public List<Estado> getAdjascentes(){ return adjascentes; }
+    public List<Edge> getAdjascencias(){ return adjascencias; }
+    public int getMenorCusto() { return menorCusto; }
+    public Estado getPaiMenorCusto() { return paiMenorCusto; }
 
     @Override
     public String toString(){
@@ -52,7 +67,7 @@ public class Estado {
     public int hashCode() {
         int hash = 3;
         hash = 79 * hash + Objects.hashCode(this.coordenada);
-        hash = 79 * hash + Objects.hashCode(this.adjascentes);
+        hash = 79 * hash + Objects.hashCode(this.adjascencias);
         hash = 79 * hash + (this.visited ? 1 : 0);
         return hash;
     }

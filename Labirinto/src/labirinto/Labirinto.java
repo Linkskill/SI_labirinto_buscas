@@ -36,17 +36,7 @@ public class Labirinto {
         agente = null;
     }
     public Labirinto (int alt, int larg){
-        altura = alt;
-        largura = larg;
-        cells = geraMatrizPrim(alt, larg);
-        /* Salva o ponto de start e exit para fácil acesso */
-        for(int i=0; i < altura; i++)
-            for(int j=0; j < largura; j++)
-                if(cells[i][j] == 'S') 
-                    start = new Estado(i, j);
-                else if(cells[i][j] == 'E')
-                    exit = new Estado(i, j);
-        agente = null;
+        this(alt, larg, geraMatrizPrim(alt, larg));
     }
     /**
      * Posiciona o agente na matriz (se existir
@@ -110,37 +100,40 @@ public class Labirinto {
         System.out.println();
     }
     /**
-     * Para cada vizinho acessível, salva o estado
-     * correspondente em uma lista, caso contrário
-     * ignora.
-     * @param row Linha/coordenada y a ser avaliada
-     * @param col Coluna/coordenada x a ser avaliada
+     * Retorna os estados que é possível chegar
+     * estando no estado passado por parâmetro.
+     * @param e Estado a ser considerado.
      * @return Lista de estados representando os destinos possíveis.
      */
-    public List<Estado> calculaEstadosPossiveis(int row, int col) {
+    public List<Estado> retornaEstadosPossiveis(Estado e) {
         List<Estado> estados = new ArrayList<>();
-        boolean isCoordinate;
+        int row = e.getY();
+        int col = e.getX();
+        boolean isCurrentState;
+        Coordenada coordenada;
         
         for(int i=row-1; i <= row+1; i++)
             for(int j=col-1; j <= col+1; j++)
             {
-                isCoordinate = (i == row && j == col);
-                if (!isCoordinate && isAccessible(i, j))
+                isCurrentState = (i == row && j == col);
+                coordenada = new Coordenada(i, j);
+                if (!isCurrentState && isAccessible(coordenada))
                     estados.add(new Estado(i, j));
             }
         return estados;
     }
     /** 
-     * Indica se a posição (row,col) na grid é acessível.
-     * @param row Linha a ser analisada.
-     * @param col Coluna a ser analisada.
-     * @return True se cells[row][col] não for uma parede
-     *         nem estiver fora dos limites, false caso
-     *         contrário.
+     * Indica se a coordenada indicada é acessível na grid.
+     * @param coordenada Coordenada a ser verificada.
+     * @return True se é acessível, false se está fora dos
+     *         limites ou se é uma parede.
      */
-    public boolean isAccessible(int row, int col) {
-        if(row < 0 || col < 0 || row >= altura || col >= largura
-            || cells[row][col] == '1')
+    public boolean isAccessible(Coordenada coordenada) {
+        int row = coordenada.getY();
+        int col = coordenada.getX();
+        boolean estaForaDosLimites = row < 0 || col < 0
+                || row >= altura || col >= largura;
+        if(estaForaDosLimites || cells[row][col] == '1')
             return false;
         return true;
     }
@@ -149,7 +142,6 @@ public class Labirinto {
     }
     public Estado getStart(){ return start; }
     public Estado getExit() { return exit; }
-    public char[][] getCells(){ return cells; }
 
     /** Adaptação do Algoritmo de Prim Randomizado
      * https://en.wikipedia.org/wiki/Maze_generation_algorithm.
