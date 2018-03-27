@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 public class Estado {
     private final Coordenada coordenada;
-    private List<Edge> adjascencias;
+    private List<Aresta> adjascencias;
     private boolean visited;
     private int menorCusto;
     private Estado paiMenorCusto;
@@ -28,7 +28,7 @@ public class Estado {
         paiMenorCusto = null;
     }
     public void adicionarAdjascencia(Estado e, int custo){
-        adjascencias.add(new Edge(e, custo));
+        adjascencias.add(new Aresta(e, custo));
     }
     public void setVisited(boolean b){
         visited = b;
@@ -45,7 +45,7 @@ public class Estado {
     public int getY() { return coordenada.getY(); }
     public int getX() { return coordenada.getX(); }
     public Coordenada getCoordenada() { return coordenada; }
-    public List<Edge> getAdjascencias(){ return adjascencias; }
+    public List<Aresta> getAdjascencias(){ return adjascencias; }
     public int getMenorCusto() { return menorCusto; }
     public Estado getPaiMenorCusto() { return paiMenorCusto; }
 

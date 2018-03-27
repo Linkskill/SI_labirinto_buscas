@@ -100,9 +100,9 @@ public class Agente {
         numEstadosVisitadosNaBusca++;
 
         if(profMax >= 1) {
-            for(Edge edge : estado.getAdjascencias())
-                if(!edge.getVizinho().isVisited()) {
-                    achouSaida = LimitedDFS(edge.getVizinho(), profMax-1);
+            for(Aresta aresta : estado.getAdjascencias())
+                if(!aresta.getVizinho().isVisited()) {
+                    achouSaida = LimitedDFS(aresta.getVizinho(), profMax-1);
                     if (achouSaida) {
                         solucao.add(estado);
                         return true;
@@ -176,7 +176,7 @@ public class Agente {
                 Collections.reverse(solucao);
                 return;
             }
-            for (Edge edge : estado.getAdjascencias())
+            for (Aresta aresta : estado.getAdjascencias())
             {
                 // custo(vizinho) = custo(estado) + peso da aresta(estado,vizinho)
                 // f(vizinho) = custo(vizinho) + valorHeuristica(vizinho)

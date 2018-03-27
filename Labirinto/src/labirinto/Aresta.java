@@ -9,11 +9,11 @@ package labirinto;
  *
  * @author Saphira
  */
-public class Edge {
+public class Aresta {
     private Estado vizinho;
     private int peso; 
 
-    public Edge(Estado e, int peso){
+    public Aresta(Estado e, int peso){
         vizinho = e;
         this.peso = peso;
     }
