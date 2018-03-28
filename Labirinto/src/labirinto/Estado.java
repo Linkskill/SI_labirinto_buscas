@@ -11,7 +11,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class Estado {
     private final Coordenada coordenada;

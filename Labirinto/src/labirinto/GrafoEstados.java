@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class GrafoEstados {
     private List<Estado> estados;

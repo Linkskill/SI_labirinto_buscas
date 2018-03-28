@@ -12,7 +12,7 @@ import java.util.Random;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class Labirinto {
     private final int altura;

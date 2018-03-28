@@ -9,7 +9,7 @@ import java.util.Comparator;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class EstadoComparator implements Comparator<Estado> {
     @Override

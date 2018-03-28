@@ -12,7 +12,7 @@ import java.util.PriorityQueue;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class Agente {
     private Labirinto labirinto;

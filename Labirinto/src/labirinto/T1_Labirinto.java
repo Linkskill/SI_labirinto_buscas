@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class T1_Labirinto {
     /**

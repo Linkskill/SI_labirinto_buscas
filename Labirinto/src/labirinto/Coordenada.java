@@ -7,7 +7,7 @@ package labirinto;
 
 /**
  *
- * @author Saphira
+ * @author Gabriel Eugenio, Lincoln Batista e Jorge Straub
  */
 public class Coordenada {
     private final int x;
