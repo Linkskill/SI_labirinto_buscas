@@ -189,11 +189,15 @@ public class Agente {
                 custo = estado.getMenorCusto() + aresta.getPeso();
                 f = custo + valorHeuristica.get(aresta.getVizinho());
                 
-               
-                estado.setMenorCusto(custo);
-                elem.getEstado().setMenorCusto(custo);
+                // setando custos
+                // se a aresta for a saida nao ha custo 
+                if(!valorHeuristica.get(aresta.getVizinho()).equals(labirinto.getExit())){
+                    estado.setMenorCusto(custo);
+                    elem.setEstado(estado);
+                    elem.setPrioridade(f);
                 
-                heapMin.add(elem);
+                    heapMin.add(elem);                
+                }
                 
                 // if (  ???  )
                 //    atualiza menorCusto e pai do vizinho
