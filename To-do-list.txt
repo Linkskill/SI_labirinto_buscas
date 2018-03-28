@@ -7,15 +7,11 @@ T1 - Entrega 21/03
 (X) Sistema inteligente com agente burro
 	(X) Movimentação do agente pelo labirinto (método deliberar()). A cada chamada do método deliberar() o agente deve executar UMA E APENAS UMA ação de movimentação
 (X) Possibilidade de informar a matriz do labirinto através de um arquivo
-(X) Diagrama de classes	-> Lincoln
-(X) .txt ou .doc falando
-	- Quantidade de estados possíveis
-	- Classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
+(X) Diagrama de classes
+(X) .txt ou .doc falando quantidade de estados possíveis e classificação do ambiente (dinâmico ou estático, discreto ou contínuo, etc)
 
 T2 - Entrega 28/03
 (X) Implementar busca cega --> aprimoramento iterativo
-( ) Implementar busca heurística --> A* -> JOOJ
-( ) Comparar número de estados que cada busca usa durante a execução
-	- Dá pra ir incrementando um contador e exibir no final
-	- Também é interessante imprimir o número de estados total (tamanho do grafo de estados)
+(X) Implementar busca heurística --> A*
+(X) Comparar número de estados que cada busca usa durante a execução
 (X) Gerar labirinto (nem precisava, mas é legal e ajuda a testar)
