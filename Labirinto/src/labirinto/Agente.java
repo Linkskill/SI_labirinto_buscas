@@ -141,8 +141,6 @@ public class Agente {
     public void AEstrela(Estado inicial)
     {
         // Estrutura para guardar as distancias até o estado final.
-        // Até pensei em colocar como atributo de Estado, mas não
-        // faz sentido já que só usa essa ideia de heurística aqui
         HashMap<Estado, Double> valorHeuristica = new HashMap<>();
         
         // Pré-computa as distâncias (computar elas enquanto procura
@@ -153,22 +151,22 @@ public class Agente {
         
         // Cria um heap mínimo para guardar os estados abertos -->
         // os que ainda vamos tentar explorar
-        Comparator<Estado> comparator = new EstadoComHeuristica(valorHeuristica, labirinto);
-        
-        PriorityQueue<Estado> prioridade = new PriorityQueue<Estado>(10, comparator);
-        
-        System.out.println(prioridade);
-        
+        PriorityQueue<EstadoComHeuristica> heapMin = new PriorityQueue<>(10, new EstadoComparator());
 
         // Cria uma lista para guardar os estados fechados --> os
         //quais já verificamos todos os vizinhos
-        List<Estado> visitados = new ArrayList<Estado>();
+        List<EstadoComHeuristica> completados = new ArrayList<>();
         
-        Estado estado=null, anterior;
+        Estado estado, anterior;
+        EstadoComHeuristica elem;
+        int custo;
+        double f;
 
-        //Coloca o estado inicial no heap, com f=0
-        //Enquanto tem elementos no heap
-            // Extrai estado com menor f do heap
+        heapMin.add(new EstadoComHeuristica(inicial, 0));
+        while(!heapMin.isEmpty())
+        {
+            elem = heapMin.remove();
+            estado = elem.getEstado();
             numEstadosVisitadosNaBusca++;
 
             if (estado.equals(labirinto.getExit())) {
@@ -188,14 +186,14 @@ public class Agente {
             }
             for (Aresta aresta : estado.getAdjascencias())
             {
-                // custo(vizinho) = custo(estado) + peso da aresta(estado,vizinho)
-                // f(vizinho) = custo(vizinho) + valorHeuristica(vizinho)
+                custo = estado.getMenorCusto() + aresta.getPeso();
+                f = custo + valorHeuristica.get(aresta.getVizinho());
 
                 // if (  ???  )
                 //    atualiza menorCusto e pai do vizinho
                 //    coloca vizinho no heap
             }
-            // Coloca E no conjunto de estados fechados
+            completados.add(elem);
     }
     /**
      * Calcula a distância euclidiana entre o estado
