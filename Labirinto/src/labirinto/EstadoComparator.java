@@ -13,9 +13,9 @@ import java.util.Comparator;
  */
 public class EstadoComparator implements Comparator<EstadoComHeuristica> {
     @Override
-    public int compare(Estado e1, Estado e2) {
+    public int compare(EstadoComHeuristica e1, EstadoComHeuristica e2) {
         // 0 se for igual, positivo se prioridade do e1 é menor
         // do que e2, negativo se prioridade do e2 é menor do que e1
-        return e2.getPrioridade() - e1.getPrioridade();
+        return (int) (e2.getPrioridade() - e1.getPrioridade());
     }
 }

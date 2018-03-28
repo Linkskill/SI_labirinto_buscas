@@ -188,12 +188,20 @@ public class Agente {
             {
                 custo = estado.getMenorCusto() + aresta.getPeso();
                 f = custo + valorHeuristica.get(aresta.getVizinho());
-
+                
+               
+                estado.setMenorCusto(custo);
+                elem.getEstado().setMenorCusto(custo);
+                
+                heapMin.add(elem);
+                
                 // if (  ???  )
                 //    atualiza menorCusto e pai do vizinho
                 //    coloca vizinho no heap
             }
             completados.add(elem);
+        }
+        
     }
     /**
      * Calcula a distância euclidiana entre o estado
@@ -202,7 +210,7 @@ public class Agente {
      * @return Distância euclidiana entre o estado
      *         e o estado final.
      */
-    private double heuristica (Estado e){
+    private double heuristica (Estado e){    
         int x1 = e.getX();
         int y1 = e.getY();
         int x2 = labirinto.getExit().getX();
