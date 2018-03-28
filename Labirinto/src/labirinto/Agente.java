@@ -8,8 +8,6 @@ package labirinto;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.PriorityQueue;
 
 /**
@@ -36,6 +34,9 @@ public class Agente {
     
     /**
      * "Liga" o agente.
+     * @param alg Algoritmo de busca a ser usado.
+     * '1' - Aprof Iterativo
+     * '2' - A*
      */
     public void run(char alg){
         System.out.println("Montando grafo de estados...");
@@ -224,7 +225,7 @@ public class Agente {
      * Calcula a distância euclidiana entre o estado
      * passado por parâmetro e o final. 
      */
-    private double heuristica (Estado e){
+    private double heuristica (Estado e){    
         int x1 = e.getX();
         int y1 = e.getY();
         int x2 = labirinto.getExit().getX();
