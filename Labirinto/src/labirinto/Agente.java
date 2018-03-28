@@ -8,7 +8,9 @@ package labirinto;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 /**
  *
@@ -62,6 +64,8 @@ public class Agente {
                             + grafoEstados.getSize());
         System.out.println("Número de estados visitados na busca: "
                             + numEstadosVisitadosNaBusca);
+        
+        AEstrela(estadoAtual);
     }
 
     /**
@@ -140,7 +144,7 @@ public class Agente {
         // Até pensei em colocar como atributo de Estado, mas não
         // faz sentido já que só usa essa ideia de heurística aqui
         HashMap<Estado, Double> valorHeuristica = new HashMap<>();
-
+        
         // Pré-computa as distâncias (computar elas enquanto procura
         // pela saída pode fazer com que chame a função várias vezes
         // para um mesmo estado (processamento desnecessário))
@@ -149,10 +153,16 @@ public class Agente {
         
         // Cria um heap mínimo para guardar os estados abertos -->
         // os que ainda vamos tentar explorar
-        // Dar uma procurada em PriorityQueue do Java
+        Comparator<Estado> comparator = new EstadoComHeuristica(valorHeuristica, labirinto);
+        
+        PriorityQueue<Estado> prioridade = new PriorityQueue<Estado>(10, comparator);
+        
+        System.out.println(prioridade);
+        
 
         // Cria uma lista para guardar os estados fechados --> os
         //quais já verificamos todos os vizinhos
+        List<Estado> visitados = new ArrayList<Estado>();
         
         Estado estado=null, anterior;
 
