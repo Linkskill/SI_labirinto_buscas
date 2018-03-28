@@ -11,11 +11,19 @@ import java.util.Comparator;
  *
  * @author Saphira
  */
-public class EstadoComparator implements Comparator<EstadoComHeuristica> {
+public class EstadoComparator implements Comparator<Estado> {
     @Override
     public int compare(Estado e1, Estado e2) {
-        // 0 se for igual, positivo se prioridade do e1 é menor
-        // do que e2, negativo se prioridade do e2 é menor do que e1
-        return e2.getPrioridade() - e1.getPrioridade();
+        //https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html
+        //O primeiro elemento de PriorityQueue é o menor elemento
+        // em relação à ordem especificada. Se a ordem é natural,
+        // (1<2<3<4...), funciona como uma lista de prioridades
+        // mínima (maior prioridade = valor mais baixo).
+        
+        // Para definir um ordem natural, precisamos retornar:
+        //  inteiro negativo se e1 vem antes de e2
+        //  0 se e1 e e2 forem iguais
+        //  inteiro positivo se e2 vem antes de e1
+        return (int) (e1.getF() - e2.getF());
     }
 }

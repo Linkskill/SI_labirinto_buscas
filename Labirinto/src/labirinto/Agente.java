@@ -21,7 +21,7 @@ public class Agente {
     private Estado estadoAtual;
     private GrafoEstados grafoEstados;
     private List<Estado> solucao;
-    private int numEstadosVisitadosNaBusca;
+    private int numEstadosPercorridosNaBusca;
 
     
     public Agente(Labirinto lab){
@@ -31,13 +31,13 @@ public class Agente {
         estadoAtual = labirinto.getStart();
         grafoEstados = new GrafoEstados(labirinto);
         solucao = new ArrayList<>();
-        numEstadosVisitadosNaBusca = 0;
+        numEstadosPercorridosNaBusca = 0;
     }
     
     /**
      * "Liga" o agente.
      */
-    public void run(){
+    public void run(char alg){
         System.out.println("Montando grafo de estados...");
         grafoEstados.construir(estadoAtual);
 
@@ -50,7 +50,10 @@ public class Agente {
         }
 
         System.out.println("Procurando solução...");
-        aprofundamentoIterativo(estadoAtual);
+        if (alg == '1')
+            aprofundamentoIterativo(estadoAtual);
+        else //alg == '2'
+            AEstrela(estadoAtual);
         
         System.out.println("Percorrendo caminho...");
         walkThroughSolution();
@@ -63,7 +66,7 @@ public class Agente {
         System.out.println("Número de estados no grafo de estados: "
                             + grafoEstados.getSize());
         System.out.println("Número de estados visitados na busca: "
-                            + numEstadosVisitadosNaBusca);
+                            + numEstadosPercorridosNaBusca);
         
         AEstrela(estadoAtual);
     }
@@ -101,7 +104,7 @@ public class Agente {
         boolean achouSaida;
 
         estado.setVisited(true);
-        numEstadosVisitadosNaBusca++;
+        numEstadosPercorridosNaBusca++;
 
         if(profMax >= 1) {
             for(Aresta aresta : estado.getAdjascencias())
@@ -135,72 +138,91 @@ public class Agente {
     }
     /**
      * Soluciona o labirinto levando em conta uma função
-     * de custo e uma função heurística.
+     * de custo e uma função heurística. Escolhe sempre
+     * escolher o estado E com menor f tal que f=g(E)+h(E)
+     * g = função de custo
+     * h = função heurística
+     * 
      * @param inicial Estado inicial
      */
     public void AEstrela(Estado inicial)
     {
-        // Estrutura para guardar as distancias até o estado final.
-        HashMap<Estado, Double> valorHeuristica = new HashMap<>();
-        
-        // Pré-computa as distâncias (computar elas enquanto procura
-        // pela saída pode fazer com que chame a função várias vezes
-        // para um mesmo estado (processamento desnecessário))
+        // Pré-computa as distâncias
         for (Estado e : grafoEstados.getEstados())
-            valorHeuristica.put(e, heuristica(e));
-        
+        {
+            e.setF(Double.MAX_VALUE);
+            e.setG(Integer.MAX_VALUE);
+            e.setH(heuristica(e));
+            e.setPai(null);
+        }
+       
         // Cria um heap mínimo para guardar os estados abertos -->
         // os que ainda vamos tentar explorar
-        PriorityQueue<EstadoComHeuristica> heapMin = new PriorityQueue<>(10, new EstadoComparator());
+        PriorityQueue<Estado> heapMin = new PriorityQueue<>(10, new EstadoComparator());
 
         // Cria uma lista para guardar os estados fechados --> os
         //quais já verificamos todos os vizinhos
-        List<EstadoComHeuristica> completados = new ArrayList<>();
+        List<Estado> fechados = new ArrayList<>();
         
-        Estado estado, anterior;
-        EstadoComHeuristica elem;
-        int custo;
-        double f;
+        Estado estado, vizinho;
+        double novoF;
+        int novoG;
 
-        heapMin.add(new EstadoComHeuristica(inicial, 0));
+        inicial.setG(0);
+        inicial.setF(inicial.getH());
+        heapMin.add(inicial);
         while(!heapMin.isEmpty())
         {
-            elem = heapMin.remove();
-            estado = elem.getEstado();
-            numEstadosVisitadosNaBusca++;
+            estado = heapMin.remove();
+            numEstadosPercorridosNaBusca++;
 
             if (estado.equals(labirinto.getExit())) {
                 // Se achou a saida, salva esse caminho como a solução
-                solucao.add(estado);
-                anterior = estado.getPaiMenorCusto();
-                while(anterior != null)
-                {
-                    solucao.add(anterior);
-                    anterior = anterior.getPaiMenorCusto();
-                }
-                /* Como a lista foi preenchida da exit para o spawn,
-                é necessário inverter a ordem dos passos para que o
-                agente ande do spawn até a exit. */
-                Collections.reverse(solucao);
+                reconstroiCaminho(estado);
                 return;
             }
             for (Aresta aresta : estado.getAdjascencias())
             {
-                custo = estado.getMenorCusto() + aresta.getPeso();
-                f = custo + valorHeuristica.get(aresta.getVizinho());
+                vizinho = aresta.getVizinho();
+                novoG = custo(estado, aresta);
+                novoF = novoG + vizinho.getH();
 
-                // if (  ???  )
-                //    atualiza menorCusto e pai do vizinho
-                //    coloca vizinho no heap
+                //Se já foi fechado, ignora
+                if (fechados.contains(vizinho))
+                    continue;
+                //Se já foi descoberto
+                if (heapMin.contains(vizinho)) {
+                    //E sabemos um caminho menor, ignora
+                    if (novoF >= vizinho.getF())
+                        continue;
+                    else { //Se esse caminho é melhor, atualiza
+                        heapMin.remove(vizinho);
+                        vizinho.setG(novoG);
+                        vizinho.setF(novoF);
+                        vizinho.setPai(estado);
+                        heapMin.add(vizinho);
+                    }
+                } else { //Se ainda não foi descoberto
+                    vizinho.setG(novoG);
+                    vizinho.setF(novoF);
+                    vizinho.setPai(estado);
+                    heapMin.add(vizinho);
+                }
             }
-            completados.add(elem);
+            fechados.add(estado);
+        }
     }
     /**
+     * Função G do A*.
+     * G(vizinho) = G(estado) + peso da aresta (estado,vizinho)
+     */
+    private int custo (Estado e, Aresta a){
+        return e.getG() + a.getPeso();
+    }
+    /**
+     * Função H do A*.
      * Calcula a distância euclidiana entre o estado
-     * passado por parâmetro e o final.
-     * @param e Estado que terá a distância calculada.
-     * @return Distância euclidiana entre o estado
-     *         e o estado final.
+     * passado por parâmetro e o final. 
      */
     private double heuristica (Estado e){
         int x1 = e.getX();
@@ -208,6 +230,20 @@ public class Agente {
         int x2 = labirinto.getExit().getX();
         int y2 = labirinto.getExit().getY();
         return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
+    }
+    public void reconstroiCaminho(Estado estado){
+        Estado anterior;
+        solucao.add(estado);
+        anterior = estado.getPai();
+        while(anterior != null)
+        {
+            solucao.add(anterior);
+            anterior = anterior.getPai();
+        }
+        /* Como a lista foi preenchida da exit para o spawn,
+        é necessário inverter a ordem dos passos para que o
+        agente ande do spawn até a exit. */
+        Collections.reverse(solucao);
     }
     /**
      * Faz o agente percorrer a solução encontrada.

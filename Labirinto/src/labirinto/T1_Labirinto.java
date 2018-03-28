@@ -62,7 +62,17 @@ public class T1_Labirinto {
         lab.show();
         System.out.println("Inserindo agente...");
         Agente agente = new Agente(lab);
-        agente.run();
+
+        option = '0';
+        while(option != '1' && option != '2')
+        {
+            System.out.println("Escolha o algoritmo de busca: ");
+            System.out.println("(1) Aprofundamento Iterativo");
+            System.out.println("(2) A*");
+            option = input.next().charAt(0);
+            System.out.println();
+        }
+        agente.run(option);
     }
 
     public static char[][] getMatrixFromFile(String filename){

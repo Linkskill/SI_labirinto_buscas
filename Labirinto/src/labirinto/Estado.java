@@ -17,15 +17,15 @@ public class Estado {
     private final Coordenada coordenada;
     private List<Aresta> adjascencias;
     private boolean visited;
-    private int menorCusto;
-    private Estado paiMenorCusto;
+    private double f;
+    private int g;
+    private double h;
+    private Estado pai;
     
     public Estado (int y, int x){
         coordenada = new Coordenada(y, x);
         adjascencias = new LinkedList<>();
         visited = false;
-        menorCusto = Integer.MAX_VALUE;
-        paiMenorCusto = null;
     }
     public void adicionarAdjascencia(Estado e, int custo){
         adjascencias.add(new Aresta(e, custo));
@@ -36,18 +36,26 @@ public class Estado {
     public boolean isVisited(){
         return visited;
     }
-    public void setMenorCusto(int menorCusto) {
-        this.menorCusto = menorCusto;
-    }
-    public void setPaiMenorCusto(Estado paiMenorCusto) {
-        this.paiMenorCusto = paiMenorCusto;
-    }
     public int getY() { return coordenada.getY(); }
     public int getX() { return coordenada.getX(); }
     public Coordenada getCoordenada() { return coordenada; }
     public List<Aresta> getAdjascencias(){ return adjascencias; }
-    public int getMenorCusto() { return menorCusto; }
-    public Estado getPaiMenorCusto() { return paiMenorCusto; }
+    public double getF() { return f; }
+    public int getG() { return g; }
+    public double getH() { return h; }
+    public Estado getPai() { return pai; }
+    public void setF(double f) {
+        this.f = f;
+    }
+    public void setG(int g) {
+        this.g = g;
+    }
+    public void setH(double h) {
+        this.h = h;
+    }
+    public void setPai(Estado e) {
+        pai = e;
+    }
 
     @Override
     public String toString(){
